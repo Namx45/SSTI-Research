@@ -74,7 +74,7 @@ such characters mentioned before hoping until an error acheived.
 	> ssti payload wordlist
 	---->
 	https://github.com/payloadbox/ssti-payloads
-	https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/		Server%20Side%20Template%20Injection/Intruder/ssti.fuzz
+	https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Server%20Side%20Template%20Injection/Intruder/ssti.fuzz
 	
 
 
@@ -86,8 +86,8 @@ such characters mentioned before hoping until an error acheived.
 
 
 
-     Identification :
-------------------------------
+# Identification :
+
 Now as mentioned in the second note in the detection section
 fully detailed errors are very rare & inorder to detect what
 kind of template engine is being used in the back-end you 
@@ -113,8 +113,7 @@ by the engine while red arrow means the payload returns as is.
   the programming language the framework is based upon.
   
 
-LAB NOTES :
-==============
+Notes
 
 after following the decision tree we finished with
 the results we are either dealing with twig or jinja2
@@ -142,8 +141,7 @@ in twig (php based) the injection will return ---> 49
 
 
 
-	Syntax :
----------------------------
+# Syntax :
 
 > Jinja template documentation
 https://jinja.palletsprojects.com/en/2.11.x/api/#jinja2.Environment
@@ -206,7 +204,7 @@ subprocess.Popen("whoami", shell=True, stdout=-1).communicate()
 
 
 
-# CTF POC :
+CTF POC :
   
 > Method 1
 http://MACHINE_IP:5000/profile/{% import os ; os.system("whoami") }}
@@ -349,8 +347,8 @@ http://MACHINE_IP:5000/profile/{{ ''.__class__.__mro__[1].__subclasses__()[401](
 
 
 
-       Remediation :
-----------------------------
+# Remediation :
+
 ```
 Insecure: Concatenating input
 template = f"<h1>Welcome to the profile of {user}!</h1>"
@@ -466,8 +464,8 @@ in the advanced SSTI guide (gitlab)
 
 
 
-	 MORE :
----------------------------
+# MORE :
+
 
 > advanced SSTI guide :
 ---->
