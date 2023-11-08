@@ -26,7 +26,8 @@ jinja2 + mako ---> python based template engies
 
       Flask python package of template
        engine code snipper example :
----------------------------------------------     
+---------------------------------------------   
+```
    from flask import Flask, render_template_string
    app = Flask(__name__)
 
@@ -37,7 +38,7 @@ jinja2 + mako ---> python based template engies
        return render_template_string(template)
 
    app.run()
-
+```
         
 
 
