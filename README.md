@@ -93,7 +93,7 @@ fully detailed errors are very rare & inorder to detect what
 kind of template engine is being used in the back-end you 
 could perform a series of SSTI payloads to acheive this.
 
-> to do so look at the file : "template engine desicion tee.jpg"
+> to do so look at the file : "SSTI Framework desicion tree.jpg"
 
 follow the payload tree on the lab provided in the ssti room in THM.
 https://tryhackme.com/room/learnssti
